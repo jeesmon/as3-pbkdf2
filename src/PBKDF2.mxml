@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" height="250" width="700">
+	<mx:Script>
+		<![CDATA[
+			import mx.managers.CursorManager;
+			import flash.utils.setTimeout;
+			import classes.PBKDF2;
+			import classes.SHA1;
+			
+			[Bindable]
+			private var status_var:String;
+			
+			private var status_count:Number = 0;
+			private var start:Number;
+			private var end:Number;
+			
+			private function status_func(percent_done:Number):void {
+				if(status_count++ % 10 == 0) {
+				  status_var = "Computed " + Math.floor(percent_done) + "%";
+				}
+			}
+			
+			private function result_func(key:String):void {
+				end = (new Date).getTime();
+				CursorManager.removeBusyCursor();
+				status_var = "The derived " + (Number(bytes.text)*8) + "-bit key is: " + key;
+				time.text = "Took " + ( (end - start) / 1000) + " secs";
+			}
+			
+			private function submit(event:Event):void {
+				CursorManager.setBusyCursor();
+				setTimeout(deriveKey, 5);
+			}
+			
+			private function deriveKey():void {
+				start = (new Date).getTime();
+				var pbkdf2:classes.PBKDF2 = new classes.PBKDF2(password.text, salt.text, Number(iterations.text), Number(bytes.text));
+				pbkdf2.deriveKey(status_func, result_func);
+			}
+		]]>
+	</mx:Script>
+	
+	<mx:Style>
+		FormItemLabel {
+			text-align: left;
+		}
+	</mx:Style>
+	
+	<mx:VBox>
+		<mx:Form>
+			<mx:FormItem label="Passphrase:">
+				<mx:TextInput id="password" text="passphrase" width="200" />
+			</mx:FormItem>
+			<mx:FormItem label="Salt:">
+				<mx:TextInput id="salt" text="salt" width="100" />
+			</mx:FormItem>
+			<mx:FormItem label="Number of iterations:">
+				<mx:TextInput id="iterations" text="1000" width="50" />
+			</mx:FormItem>
+			<mx:FormItem label="Number of bytes for Key:">
+				<mx:TextInput id="bytes" text="32" width="50" />
+			</mx:FormItem>
+			<mx:FormItem>
+				<mx:Button id="button" label="Derive Key" click="submit(event)" />
+			</mx:FormItem>
+		</mx:Form>
+		<mx:Label id="status" text="{status_var}" fontSize="12" />
+		<mx:Label id="time" />	
+	</mx:VBox>
+</mx:Application>
