@@ -1,0 +1,1 @@
+Action Script 3.0 port of Java Script implementation of Password-Based Key Derivation Function 2 (PBKDF2) available at http://anandam.name/pbkdf2/
